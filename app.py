@@ -13,6 +13,7 @@ st.set_page_config(
     layout="wide"
 )
 
+# Urutan kelas harus sama seperti training
 CLASS_NAMES = [
     "arjuna", "bagong", "bathara surya", "bathara wisnu", "gareng",
     "nakula", "petruk", "sadewa", "semar", "werkudara", "yudistira"
@@ -22,15 +23,32 @@ MODEL_PATH = "cnn_mobilenetv2_wayang_final.h5"
 IMG_SIZE = (224, 224)
 
 # ==============================
-# CUSTOM STYLE (CLEAN & WIDE)
+# CUSTOM STYLE (CLEAN & WIDE) + HIDE WHITE SHAPES
 # ==============================
 st.markdown("""
 <style>
+/* Layout */
 .block-container {
-    padding-top: 2rem;
+    padding-top: 1.2rem !important;
     padding-bottom: 2rem;
     max-width: 1300px;
 }
+
+/* Hide Streamlit top decorations / toolbars (removes white rounded shapes) */
+div[data-testid="stHeader"],
+div[data-testid="stToolbar"],
+div[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+/* If any empty text inputs get rendered, hide them */
+div[data-testid="stTextInput"],
+div[data-testid="stTextInput"] > div,
+input[type="text"] {
+    display: none !important;
+}
+
+/* Typography */
 h1 {
     font-size: 2.4rem;
     font-weight: 900;
@@ -41,6 +59,8 @@ h1 {
     margin-bottom: 1.5rem;
     font-size: 1rem;
 }
+
+/* Cards */
 .card {
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 18px;
@@ -48,10 +68,13 @@ h1 {
     background: #ffffff;
     box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
+
+/* Metrics */
 .metricRow {
     display: flex;
     gap: 14px;
     margin-bottom: 12px;
+    flex-wrap: wrap;
 }
 .metric {
     padding: 12px 16px;
@@ -68,6 +91,8 @@ h1 {
     font-size: 1.2rem;
     font-weight: 800;
 }
+
+/* Top-3 list */
 .top3 li {
     margin-bottom: 6px;
     font-size: 1rem;
@@ -113,6 +138,7 @@ with col_left:
 
     img = Image.open(uploaded).convert("RGB")
     st.image(img, use_container_width=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------- RIGHT: RESULT ----------
