@@ -35,6 +35,41 @@ def load_css(path: str):
 load_css("assets/style.css")
 
 # ==============================
+# WALLPAPER BACKGROUND (pakai assets/banner.png)
+# ==============================
+# NOTE: jangan tampilkan banner pakai st.image(), kita set jadi background
+if os.path.exists("assets/banner.png"):
+    st.markdown("""
+    <style>
+    /* Banner sebagai wallpaper */
+    [data-testid="stAppViewContainer"]{
+        background-image: url("assets/banner.png");
+        background-size: cover;
+        background-position: center top;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    /* Biar konten kebaca: kasih overlay putih transparan + blur */
+    .block-container{
+        background: rgba(255,255,255,0.78);
+        backdrop-filter: blur(6px);
+        border-radius: 22px;
+        padding: 22px !important;
+        margin-top: 18px;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+    }
+
+    /* Opsional: biar jarak atas rapi */
+    .block-container > div:first-child{
+        padding-top: 4px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    st.warning("Banner tidak ditemukan: assets/banner.png (cek nama file/huruf besar-kecil)")
+
+# ==============================
 # LOAD MODEL
 # ==============================
 @st.cache_resource
@@ -44,7 +79,7 @@ def load_model():
 model = load_model()
 
 # ==============================
-# HERO HEADER (pakai class CSS kamu)
+# HERO HEADER (pakai class CSS)
 # ==============================
 st.markdown("""
 <div class="hero">
@@ -53,10 +88,6 @@ st.markdown("""
   <div class="subtitle">Upload gambar wayang untuk melihat hasil klasifikasi (Top-3)</div>
 </div>
 """, unsafe_allow_html=True)
-
-# Banner image (tanpa tulisan pun oke)
-if os.path.exists("assets/banner.png"):
-    st.image("assets/banner.png", use_container_width=True)
 
 # ==============================
 # MAIN LAYOUT
@@ -81,7 +112,6 @@ with col_left:
 
     img = Image.open(uploaded).convert("RGB")
     st.image(img, use_container_width=True)
-
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------- RIGHT ----------
@@ -115,7 +145,7 @@ with col_right:
     </div>
     """, unsafe_allow_html=True)
 
-    # top-3 (biar lebih visual)
+    # top-3 (lebih visual)
     st.markdown("**Top-3 Prediksi:**")
     top3 = np.argsort(probs)[::-1][:3]
     for i, idx in enumerate(top3, start=1):
@@ -125,7 +155,7 @@ with col_right:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================
-# FOOTER (pakai class CSS kamu)
+# FOOTER
 # ==============================
 st.markdown(
     "<div class='footer'>Model: CNN MobileNetV2 • Output: Top-3 Prediksi</div>",
