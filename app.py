@@ -6,115 +6,77 @@ import tensorflow as tf
 from PIL import Image
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
-st.set_page_config(page_title="Klasifikasi Tokoh Wayang", page_icon="🎭", layout="wide")
+# ==============================
+# PAGE CONFIG
+# ==============================
+st.set_page_config(
+    page_title="Klasifikasi Tokoh Wayang",
+    page_icon="🎭",
+    layout="wide"
+)
 
 CLASS_NAMES = [
     "arjuna", "bagong", "bathara surya", "bathara wisnu", "gareng",
     "nakula", "petruk", "sadewa", "semar", "werkudara", "yudistira"
 ]
+
 MODEL_PATH = "cnn_mobilenetv2_wayang_final.h5"
 IMG_SIZE = (224, 224)
 
+# ==============================
+# LOAD CSS
+# ==============================
 def load_css(path: str):
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     else:
-        st.warning(f"CSS tidak ditemukan: {path}")
+        st.error(f"CSS tidak ditemukan: {path}")
 
 load_css("assets/style.css")
 
-# ====== FORCE REMOVE TOP GAP + HERO FIX ======
-def img_to_data_uri(path: str) -> str:
-    with open(path, "rb") as f:
-        data = f.read()
-    b64 = base64.b64encode(data).decode()
+# ==============================
+# INJECT HERO BANNER AS CSS VARIABLE (base64)
+# ==============================
+def to_data_uri(png_path: str) -> str:
+    with open(png_path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode("utf-8")
     return f"data:image/png;base64,{b64}"
 
-banner_uri = None
 if os.path.exists("assets/banner.png"):
-    banner_uri = img_to_data_uri("assets/banner.png")
+    hero_bg = to_data_uri("assets/banner.png")
+    st.markdown(
+        f"<style>:root{{--hero-bg:url('{hero_bg}');}}</style>",
+        unsafe_allow_html=True
+    )
+else:
+    st.warning("Banner tidak ditemukan: assets/banner.png (cek nama file/huruf besar-kecil)")
 
-st.markdown(f"""
-<style>
-/* benerin jarak atas streamlit */
-.block-container {{
-  padding-top: 0rem !important;
-  margin-top: -48px !important;
-  max-width: 1300px;
-}}
-
-/* HERO yang gak kepotong + pasti pakai banner */
-.hero {{
-  position: relative;
-  width: 100%;
-  min-height: 240px;              /* biar gak kepotong */
-  border-radius: 0 0 28px 28px;
-  padding: 56px 36px;
-  margin: 0 0 26px 0;
-  overflow: hidden;
-  background-image: url("{banner_uri if banner_uri else ''}");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: 0 14px 35px rgba(0,0,0,0.14);
-}}
-
-.hero::before {{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.55));
-}}
-
-.hero > * {{
-  position: relative;
-  z-index: 2;
-}}
-
-.heroTitle {{
-  font-size: 2.65rem;
-  font-weight: 900;
-  margin: 10px 0 0 0;
-  color: #fff;
-}}
-
-.subtitle {{
-  color: rgba(255,255,255,0.92);
-  margin-top: 10px;
-  font-size: 1.05rem;
-}}
-
-.badge {{
-  display: inline-block;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.38);
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.85rem;
-  backdrop-filter: blur(6px);
-}}
-</style>
-""", unsafe_allow_html=True)
-
+# ==============================
+# LOAD MODEL
+# ==============================
 @st.cache_resource
 def load_model():
     return tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 model = load_model()
 
-# ===== HERO =====
+# ==============================
+# HERO
+# ==============================
 st.markdown("""
 <div class="hero">
-  <span class="badge">🎭 Wayang Classification</span>
-  <div class="heroTitle">Klasifikasi Tokoh Wayang</div>
-  <div class="subtitle">Upload gambar wayang untuk melihat hasil klasifikasi (Top-3)</div>
+  <div class="heroInner">
+    <span class="badge">🎭 Wayang Classification</span>
+    <div class="heroTitle">Klasifikasi Tokoh Wayang</div>
+    <div class="subtitle">Upload gambar wayang untuk melihat hasil klasifikasi (Top-3)</div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ===== MAIN LAYOUT =====
+# ==============================
+# MAIN LAYOUT
+# ==============================
 col_left, col_right = st.columns([1.4, 1], gap="large")
 
 with col_left:
