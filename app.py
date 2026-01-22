@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import numpy as np
 import tensorflow as tf
@@ -13,7 +14,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Urutan kelas harus sama seperti training
 CLASS_NAMES = [
     "arjuna", "bagong", "bathara surya", "bathara wisnu", "gareng",
     "nakula", "petruk", "sadewa", "semar", "werkudara", "yudistira"
@@ -23,82 +23,16 @@ MODEL_PATH = "cnn_mobilenetv2_wayang_final.h5"
 IMG_SIZE = (224, 224)
 
 # ==============================
-# CUSTOM STYLE (CLEAN & WIDE) + HIDE WHITE SHAPES
+# LOAD CSS (assets/style.css)
 # ==============================
-st.markdown("""
-<style>
-/* Layout */
-.block-container {
-    padding-top: 1.2rem !important;
-    padding-bottom: 2rem;
-    max-width: 1300px;
-}
+def load_css(path: str):
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    else:
+        st.warning(f"CSS tidak ditemukan: {path}")
 
-/* Hide Streamlit top decorations / toolbars (removes white rounded shapes) */
-div[data-testid="stHeader"],
-div[data-testid="stToolbar"],
-div[data-testid="stDecoration"] {
-    display: none !important;
-}
-
-/* If any empty text inputs get rendered, hide them */
-div[data-testid="stTextInput"],
-div[data-testid="stTextInput"] > div,
-input[type="text"] {
-    display: none !important;
-}
-
-/* Typography */
-h1 {
-    font-size: 2.4rem;
-    font-weight: 900;
-    margin-bottom: 0.25rem;
-}
-.subtitle {
-    color: #6b7280;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-}
-
-/* Cards */
-.card {
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 18px;
-    padding: 20px;
-    background: #ffffff;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-}
-
-/* Metrics */
-.metricRow {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-}
-.metric {
-    padding: 12px 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(0,0,0,0.08);
-    background: #fafafa;
-    min-width: 200px;
-}
-.metric .label {
-    font-size: 0.9rem;
-    color: #6b7280;
-}
-.metric .value {
-    font-size: 1.2rem;
-    font-weight: 800;
-}
-
-/* Top-3 list */
-.top3 li {
-    margin-bottom: 6px;
-    font-size: 1rem;
-}
-</style>
-""", unsafe_allow_html=True)
+load_css("assets/style.css")
 
 # ==============================
 # LOAD MODEL
@@ -110,20 +44,29 @@ def load_model():
 model = load_model()
 
 # ==============================
-# HEADER
+# HERO HEADER (pakai class CSS kamu)
 # ==============================
-st.title("🎭 Klasifikasi Tokoh Wayang")
-st.markdown('<div class="subtitle">Upload gambar wayang untuk melihat hasil klasifikasi</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="hero">
+  <span class="badge">🎭 Wayang Classification</span>
+  <div class="heroTitle">Klasifikasi Tokoh Wayang</div>
+  <div class="subtitle">Upload gambar wayang untuk melihat hasil klasifikasi (Top-3)</div>
+</div>
+""", unsafe_allow_html=True)
+
+# Banner image (tanpa tulisan pun oke)
+if os.path.exists("assets/banner.png"):
+    st.image("assets/banner.png", use_container_width=True)
 
 # ==============================
 # MAIN LAYOUT
 # ==============================
 col_left, col_right = st.columns([1.4, 1], gap="large")
 
-# ---------- LEFT: IMAGE ----------
+# ---------- LEFT ----------
 with col_left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("Upload Gambar")
+    st.subheader("📤 Upload Gambar")
 
     uploaded = st.file_uploader(
         "Pilih file gambar (JPG / PNG)",
@@ -141,10 +84,10 @@ with col_left:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------- RIGHT: RESULT ----------
+# ---------- RIGHT ----------
 with col_right:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.subheader("Hasil Prediksi")
+    st.subheader("📌 Hasil Prediksi")
 
     # preprocess
     img_resized = img.resize(IMG_SIZE)
@@ -172,20 +115,19 @@ with col_right:
     </div>
     """, unsafe_allow_html=True)
 
-    # top-3
+    # top-3 (biar lebih visual)
     st.markdown("**Top-3 Prediksi:**")
     top3 = np.argsort(probs)[::-1][:3]
-    st.markdown("<ul class='top3'>", unsafe_allow_html=True)
     for i, idx in enumerate(top3, start=1):
-        st.markdown(f"<li><b>{i}. {CLASS_NAMES[idx]}</b> — {probs[idx]:.4f}</li>", unsafe_allow_html=True)
-    st.markdown("</ul>", unsafe_allow_html=True)
+        st.progress(float(probs[idx]))
+        st.write(f"**{i}. {CLASS_NAMES[idx]}** — {probs[idx]:.4f}")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 # ==============================
-# FOOTER
+# FOOTER (pakai class CSS kamu)
 # ==============================
 st.markdown(
-    "<div style='text-align:center; color:#6b7280; margin-top:16px;'>Model: CNN MobileNetV2 • Output: Top-3 Prediksi</div>",
+    "<div class='footer'>Model: CNN MobileNetV2 • Output: Top-3 Prediksi</div>",
     unsafe_allow_html=True
 )
