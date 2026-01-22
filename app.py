@@ -54,6 +54,32 @@ if os.path.exists(BANNER_PATH):
     )
 
 # ==============================
+# INLINE CSS: divider gold + small polish
+# ==============================
+st.markdown("""
+<style>
+/* Divider tipis gold di tengah kolom (di dalam big card) */
+.v-divider{
+  width: 1px;
+  background: linear-gradient(180deg,
+    rgba(212,175,55,0.05),
+    rgba(212,175,55,0.45),
+    rgba(212,175,55,0.05)
+  );
+  border-radius: 999px;
+  margin: 8px 0;
+}
+
+/* Halusin caption biar clean */
+.small-muted{
+  color: rgba(31,41,55,0.60);
+  font-size: 0.92rem;
+  margin-top: 6px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ==============================
 # LOAD MODEL
 # ==============================
 @st.cache_resource
@@ -76,13 +102,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================
-# MAIN LAYOUT
+# BIG CARD (Upload + Result in one panel)
 # ==============================
-col_left, col_right = st.columns([1.25, 1], gap="large")
+st.markdown('<div class="card">', unsafe_allow_html=True)
 
-# ---------- LEFT: UPLOAD ----------
+# 3 kolom: kiri | divider | kanan
+col_left, col_div, col_right = st.columns([1.25, 0.04, 1], gap="large")
+
+# ---------- LEFT ----------
 with col_left:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📤 Upload Gambar")
 
     uploaded = st.file_uploader(
@@ -92,23 +120,22 @@ with col_left:
     )
 
     if uploaded is None:
-        # clean: info kecil aja, gak rame
-        st.caption("Silakan upload gambar tokoh wayang.")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='small-muted'>Silakan upload gambar tokoh wayang.</div>", unsafe_allow_html=True)
+        img = None
     else:
         img = Image.open(uploaded).convert("RGB")
         st.image(img, use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------- RIGHT: RESULT ----------
+# ---------- DIVIDER ----------
+with col_div:
+    st.markdown("<div class='v-divider' style='height: 100%;'></div>", unsafe_allow_html=True)
+
+# ---------- RIGHT ----------
 with col_right:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📌 Hasil Prediksi")
 
-    if uploaded is None:
-        # clean: kosong rapi tanpa notif box
-        st.caption("Hasil akan tampil setelah kamu upload gambar.")
-        st.markdown("</div>", unsafe_allow_html=True)
+    if img is None:
+        st.markdown("<div class='small-muted'>Hasil prediksi akan muncul setelah kamu upload gambar.</div>", unsafe_allow_html=True)
     else:
         # preprocess
         img_resized = img.resize(IMG_SIZE)
@@ -143,5 +170,4 @@ with col_right:
             st.progress(float(probs[idx]))
             st.write(f"**{i}. {CLASS_NAMES[idx]}** — {probs[idx]:.4f}")
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
+st.markdown("</div>", unsafe_allow_html=True)
