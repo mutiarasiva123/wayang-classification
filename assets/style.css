@@ -17,23 +17,49 @@
     linear-gradient(180deg, var(--paper1) 0%, var(--paper2) 100%);
 }
 
-/* Remove Streamlit header + top paddings */
+/* Remove Streamlit header */
 div[data-testid="stHeader"],
 div[data-testid="stToolbar"],
 div[data-testid="stDecoration"]{ display:none !important; }
 
+/* kill top padding */
 div[data-testid="stAppViewBlockContainer"]{ padding-top: 0 !important; }
 
-/* Container width (biar gak kelebaran) */
+/* Container width */
 .block-container{
   max-width: 1100px;
-  padding-top: 0.4rem !important;
-  padding-bottom: 1.8rem !important;
+  padding-top: 0.35rem !important;
+  padding-bottom: 1.6rem !important;
 }
 
-/* kill “empty blocks” that look like white bars */
-div[data-testid="stVerticalBlock"] > div:empty{ display:none !important; }
-div[data-testid="stHorizontalBlock"] > div:empty{ display:none !important; }
+/* =========================
+   FIX: BAR PUTIH PANJANG
+   (ini yang bikin kamu merasa "sama aja")
+========================= */
+
+/* 1) Remove margins/paddings of first blocks after hero */
+div[data-testid="stAppViewBlockContainer"] > div{
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* 2) Kalau ada element putih panjang (seringnya stContainer / stColumns kosong),
+      kita hilangkan background + shadow + border-nya */
+div[data-testid="stAppViewBlockContainer"] div[style*="background: rgb(255"]{
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* 3) Hilangkan elemen “spacer” kosong yang punya height tapi isinya wrapper */
+div[data-testid="stVerticalBlock"] > div:has(> div:empty){
+  display:none !important;
+}
+
+/* 4) Hilangkan horizontal block kosong */
+div[data-testid="stHorizontalBlock"] > div:has(> div:empty){
+  display:none !important;
+}
 
 /* Typography */
 h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
@@ -49,16 +75,21 @@ h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
   box-shadow: var(--shadow);
   border: 1px solid rgba(212,175,55,0.22);
   min-height: 200px;
-  margin-bottom: 14px;
+  margin-bottom: 10px; /* rapetin jarak hero ke konten */
 }
+
+/* overlay dibuat lebih warm (biar ga abu) */
 .hero::before{
   content:"";
   position:absolute; inset:0;
   background:
-    radial-gradient(circle at 30% 30%, rgba(212,175,55,0.18) 0%, rgba(0,0,0,0) 55%),
-    linear-gradient(90deg, rgba(18,10,6,0.70) 0%, rgba(18,10,6,0.35) 55%, rgba(18,10,6,0.55) 100%);
+    radial-gradient(circle at 30% 30%, rgba(212,175,55,0.22) 0%, rgba(0,0,0,0) 55%),
+    linear-gradient(90deg, rgba(30,18,10,0.58) 0%, rgba(30,18,10,0.22) 55%, rgba(30,18,10,0.45) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.32));
 }
-.heroInner{ position:relative; z-index:2; padding: 30px 30px; }
+
+.heroInner{ position:relative; z-index:2; padding: 28px 30px; }
+
 .badge{
   display:inline-block;
   padding: 7px 12px;
@@ -70,6 +101,7 @@ h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
   font-size: 0.85rem;
   backdrop-filter: blur(6px);
 }
+
 .heroTitle{
   margin-top: 10px;
   font-size: 2.35rem;
@@ -77,6 +109,7 @@ h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
   color: #fff;
   text-shadow: 0 2px 16px rgba(0,0,0,0.55);
 }
+
 .subtitle{
   margin-top: 10px;
   font-size: 1.02rem;
@@ -92,17 +125,23 @@ h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
   box-shadow: 0 10px 26px rgba(0,0,0,0.06);
   padding: 18px 18px;
 }
+
 .ornament{
   height: 1px;
   width: 100%;
-  margin: 6px 0 14px 0;
-  background: linear-gradient(90deg, rgba(212,175,55,0.0), rgba(212,175,55,0.55), rgba(212,175,55,0.0));
+  margin: 4px 0 12px 0; /* rapetin */
+  background: linear-gradient(
+    90deg,
+    rgba(212,175,55,0.0),
+    rgba(212,175,55,0.55),
+    rgba(212,175,55,0.0)
+  );
 }
 
 /* Inner section titles */
 .sectionTitle{
   font-weight: 900;
-  font-size: 1.25rem;
+  font-size: 1.18rem; /* sedikit lebih sleek */
   margin: 0 0 8px 0;
 }
 
@@ -115,7 +154,13 @@ h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
 }
 
 /* Metrics */
-.metricRow{ display:flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 8px 0; }
+.metricRow{
+  display:flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 10px 0;
+}
+
 .metric{
   padding: 12px 14px;
   border-radius: 14px;
@@ -123,6 +168,7 @@ h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
   background: rgba(255,255,255,0.88);
   min-width: 210px;
 }
+
 .metric .label{ font-size: .9rem; color: rgba(31,41,55,0.60); }
 .metric .value{ font-size: 1.15rem; font-weight: 950; color: rgba(31,41,55,0.95); }
 
