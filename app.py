@@ -31,50 +31,58 @@ BANNER_PATH = "assets/banner.png"
 # ==============================
 # LOAD CSS
 # ==============================
-def load_css(path: str):
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-load_css(CSS_PATH)
+if os.path.exists(CSS_PATH):
+    with open(CSS_PATH, "r", encoding="utf-8") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ==============================
-# INJECT BANNER AS CSS VARIABLE (BASE64)
+# HERO BG (base64 -> CSS variable)
 # ==============================
-def png_to_data_uri(path: str) -> str:
+def png_to_base64(path: str) -> str:
     with open(path, "rb") as f:
-        b64 = base64.b64encode(f.read()).decode("utf-8")
-    return f"data:image/png;base64,{b64}"
+        return base64.b64encode(f.read()).decode("utf-8")
 
 if os.path.exists(BANNER_PATH):
-    hero_bg = png_to_data_uri(BANNER_PATH)
+    b64 = png_to_base64(BANNER_PATH)
     st.markdown(
-        f"<style>:root{{--hero-bg:url('{hero_bg}');}}</style>",
+        f"<style>:root{{--hero-bg:url('data:image/png;base64,{b64}');}}</style>",
         unsafe_allow_html=True
     )
 
 # ==============================
-# INLINE CSS: divider gold + small polish
+# INLINE POLISH (hapus shape kosong)
 # ==============================
 st.markdown("""
 <style>
-/* Divider tipis gold di tengah kolom (di dalam big card) */
-.v-divider{
-  width: 1px;
-  background: linear-gradient(180deg,
-    rgba(212,175,55,0.05),
-    rgba(212,175,55,0.45),
-    rgba(212,175,55,0.05)
-  );
-  border-radius: 999px;
-  margin: 8px 0;
+/* Ini yang bikin "shape putih kosong" sering muncul: elemen kosong di horizontal block */
+div[data-testid="stHorizontalBlock"] > div:has(> div:empty){
+  display:none !important;
 }
 
-/* Halusin caption biar clean */
-.small-muted{
-  color: rgba(31,41,55,0.60);
-  font-size: 0.92rem;
+/* garis pemisah tipis dalam buku */
+.book-divider{
+  height: 1px;
+  width: 100%;
+  margin: 12px 0 18px 0;
+  background: linear-gradient(90deg,
+    rgba(212,175,55,0.0),
+    rgba(212,175,55,0.45),
+    rgba(212,175,55,0.0)
+  );
+  opacity: .9;
+}
+
+/* judul section dalam buku */
+.bookTitle{
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: rgba(31,41,55,0.92);
+  margin: 0;
+}
+.bookSub{
   margin-top: 6px;
+  color: rgba(31,41,55,0.62);
+  font-size: 0.95rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -102,14 +110,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==============================
-# BIG CARD (Upload + Result in one panel)
+# "BUKU" BESAR (1 CARD)
 # ==============================
 st.markdown('<div class="card">', unsafe_allow_html=True)
 
-# 3 kolom: kiri | divider | kanan
-col_left, col_div, col_right = st.columns([1.25, 0.04, 1], gap="large")
+# Judul dalam buku (ini yang "ngisi" area atas biar ga kosong)
+st.markdown("""
+<div>
+  <div class="bookTitle">📚 Panel Klasifikasi</div>
+  <div class="bookSub">Masukkan gambar tokoh wayang di kiri, hasil prediksi akan muncul di kanan.</div>
+  <div class="book-divider"></div>
+</div>
+""", unsafe_allow_html=True)
 
-# ---------- LEFT ----------
+# ==============================
+# 2 COLUMNS INSIDE THE BOOK
+# ==============================
+col_left, col_right = st.columns([1.25, 1], gap="large")
+
+# ---------- LEFT: Upload & Preview ----------
 with col_left:
     st.subheader("📤 Upload Gambar")
 
@@ -119,23 +138,19 @@ with col_left:
         label_visibility="collapsed"
     )
 
+    img = None
     if uploaded is None:
-        st.markdown("<div class='small-muted'>Silakan upload gambar tokoh wayang.</div>", unsafe_allow_html=True)
-        img = None
+        st.caption("Silakan upload gambar tokoh wayang.")
     else:
         img = Image.open(uploaded).convert("RGB")
         st.image(img, use_container_width=True)
 
-# ---------- DIVIDER ----------
-with col_div:
-    st.markdown("<div class='v-divider' style='height: 100%;'></div>", unsafe_allow_html=True)
-
-# ---------- RIGHT ----------
+# ---------- RIGHT: Prediction ----------
 with col_right:
     st.subheader("📌 Hasil Prediksi")
 
     if img is None:
-        st.markdown("<div class='small-muted'>Hasil prediksi akan muncul setelah kamu upload gambar.</div>", unsafe_allow_html=True)
+        st.caption("Hasil akan tampil setelah kamu upload gambar.")
     else:
         # preprocess
         img_resized = img.resize(IMG_SIZE)
@@ -152,18 +167,17 @@ with col_right:
         # main prediction
         st.markdown(f"""
         <div class="metricRow">
-            <div class="metric">
-                <div class="label">Prediksi</div>
-                <div class="value">{pred_label}</div>
-            </div>
-            <div class="metric">
-                <div class="label">Confidence</div>
-                <div class="value">{pred_conf:.4f}</div>
-            </div>
+          <div class="metric">
+            <div class="label">Prediksi</div>
+            <div class="value">{pred_label}</div>
+          </div>
+          <div class="metric">
+            <div class="label">Confidence</div>
+            <div class="value">{pred_conf:.4f}</div>
+          </div>
         </div>
         """, unsafe_allow_html=True)
 
-        # top-3
         st.markdown("**Top-3 Prediksi:**")
         top3 = np.argsort(probs)[::-1][:3]
         for i, idx in enumerate(top3, start=1):
