@@ -45,9 +45,6 @@ h1, h2, h3{
   color: var(--ink);
 }
 
-st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
-}
-
 /* =========================
    HERO (Wayang Banner)
 ========================= */
