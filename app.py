@@ -34,39 +34,8 @@ def load_css(path: str):
 
 load_css("assets/style.css")
 
-# ==============================
-# WALLPAPER BACKGROUND (pakai assets/banner.png)
-# ==============================
-# NOTE: jangan tampilkan banner pakai st.image(), kita set jadi background
-if os.path.exists("assets/banner.png"):
-    st.markdown("""
-    <style>
-    /* Banner sebagai wallpaper */
-    [data-testid="stAppViewContainer"]{
-        background-image: url("assets/banner.png");
-        background-size: cover;
-        background-position: center top;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }
-
-    /* Biar konten kebaca: kasih overlay putih transparan + blur */
-    .block-container{
-        background: rgba(255,255,255,0.78);
-        backdrop-filter: blur(6px);
-        border-radius: 22px;
-        padding: 22px !important;
-        margin-top: 18px;
-        box-shadow: 0 12px 35px rgba(0,0,0,0.08);
-    }
-
-    /* Opsional: biar jarak atas rapi */
-    .block-container > div:first-child{
-        padding-top: 4px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-else:
+# (opsional) notif kalau banner belum ada
+if not os.path.exists("assets/banner.png"):
     st.warning("Banner tidak ditemukan: assets/banner.png (cek nama file/huruf besar-kecil)")
 
 # ==============================
@@ -79,7 +48,7 @@ def load_model():
 model = load_model()
 
 # ==============================
-# HERO HEADER (pakai class CSS)
+# HERO HEADER (banner dari CSS)
 # ==============================
 st.markdown("""
 <div class="hero">
@@ -119,19 +88,16 @@ with col_right:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📌 Hasil Prediksi")
 
-    # preprocess
     img_resized = img.resize(IMG_SIZE)
     x = np.array(img_resized, dtype=np.float32)
     x = np.expand_dims(x, axis=0)
     x = preprocess_input(x)
 
-    # predict
     probs = model.predict(x, verbose=0)[0]
     pred_idx = int(np.argmax(probs))
     pred_label = CLASS_NAMES[pred_idx]
     pred_conf = float(probs[pred_idx])
 
-    # main prediction
     st.markdown(f"""
     <div class="metricRow">
         <div class="metric">
@@ -145,7 +111,6 @@ with col_right:
     </div>
     """, unsafe_allow_html=True)
 
-    # top-3 (lebih visual)
     st.markdown("**Top-3 Prediksi:**")
     top3 = np.argsort(probs)[::-1][:3]
     for i, idx in enumerate(top3, start=1):
