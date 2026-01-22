@@ -1,93 +1,107 @@
-/* ===== Base ===== */
-.stApp {
+/* =========================
+   GLOBAL / LAYOUT FIX
+========================= */
+
+:root{
+  /* akan diisi dari app.py pakai base64 */
+  --hero-bg: none;
+}
+
+.stApp{
   background: radial-gradient(circle at top left, #fff7ed 0%, #f5f3ff 40%, #ecfeff 100%);
 }
 
-/* ===== Layout container (FIX: jangan ketarik ke atas biar gak kepotong) ===== */
-.block-container{
-  max-width: 1300px;
-  padding-top: 1rem !important;     /* FIX: rapet tapi aman */
-  padding-bottom: 2rem;
-  margin-top: 0px !important;       /* FIX: stop negative margin */
-}
-
-/* Extra: kadang Streamlit masih kasih padding atas */
+/* Streamlit kadang ngasih padding atas yang bikin "jarak aneh" */
 div[data-testid="stAppViewBlockContainer"]{
   padding-top: 0rem !important;
 }
 
-/* Hide Streamlit top decorations */
+/* container utama */
+.block-container{
+  max-width: 1300px;
+  padding-top: 0.75rem !important;   /* rapet tapi aman */
+  padding-bottom: 2rem !important;
+}
+
+/* hide header bawaan streamlit */
 div[data-testid="stHeader"],
 div[data-testid="stToolbar"],
 div[data-testid="stDecoration"]{
   display:none !important;
 }
 
-/* ===== Typography ===== */
-h1, h2, h3 {
-  letter-spacing: -0.02em;
+/* rapihin jarak antar elemen streamlit (biar gak terlalu renggang) */
+div[data-testid="stVerticalBlock"] > div{
+  margin-bottom: 0.85rem !important;
 }
 
-/* ===== HERO (header banner) ===== */
+/* =========================
+   HERO (BANNER)
+========================= */
+
 .hero{
   position: relative;
-  border-radius: 22px !important;       /* FIX: semua sudut rounded */
-  overflow: hidden !important;          /* FIX: anti kepotong */
-  padding: 40px 34px !important;
-  margin: 10px 0 26px 0 !important;
-  min-height: 200px !important;
-  box-shadow: 0 14px 35px rgba(0,0,0,0.14);
+  width: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.14);
+  margin: 0 0 16px 0;                /* jarak bawah pas */
+  min-height: 210px;                 /* anti kepotong */
 }
 
-/* overlay biar teks kebaca (lebih gelap dikit) */
+/* overlay biar teks kebaca & elegan */
 .hero::before{
-  content: "";
-  position: absolute;
-  inset: 0;
+  content:"";
+  position:absolute;
+  inset:0;
   background: linear-gradient(
-    rgba(0,0,0,0.40),
-    rgba(0,0,0,0.72)
-  ) !important;
+    rgba(0,0,0,0.35),
+    rgba(0,0,0,0.70)
+  );
 }
 
-/* isi hero di atas overlay */
-.hero > *{
+.heroInner{
   position: relative;
   z-index: 2;
+  padding: 34px 34px;
 }
 
-/* Title */
-.heroTitle{
-  font-size: 2.55rem;
-  font-weight: 900;
-  margin: 10px 0 0 0;
-  color: #fff;
-  letter-spacing: -0.03em;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.45);
-}
-
-/* Subtitle */
-.subtitle{
-  color: rgba(255,255,255,0.92);
-  margin-top: 10px;
-  font-size: 1.05rem;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.35);
-}
-
-/* Badge */
 .badge{
   display: inline-block;
   padding: 7px 12px;
   border-radius: 999px;
   background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.38);
+  border: 1px solid rgba(255,255,255,0.35);
   color: #fff;
   font-weight: 800;
   font-size: 0.85rem;
   backdrop-filter: blur(6px);
 }
 
-/* ===== Cards ===== */
+.heroTitle{
+  margin-top: 10px;
+  font-size: 2.45rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+}
+
+.subtitle{
+  margin-top: 10px;
+  font-size: 1.02rem;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+
+/* =========================
+   CARDS / KONTEN
+========================= */
+
 .card{
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 18px;
@@ -96,15 +110,15 @@ h1, h2, h3 {
   box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
-/* ===== Upload area ===== */
+/* upload area */
 [data-testid="stFileUploader"] > div{
   border-radius: 16px;
-  border: 1px dashed rgba(0,0,0,0.2);
+  border: 1px dashed rgba(0,0,0,0.22);
   background: rgba(255,255,255,0.75);
   padding: 10px;
 }
 
-/* ===== Metrics ===== */
+/* metrics */
 .metricRow{
   display:flex;
   gap: 14px;
@@ -122,7 +136,7 @@ h1, h2, h3 {
 
 .metric .label{
   font-size: 0.9rem;
-  color: rgba(17,24,39,0.6);
+  color: rgba(17,24,39,0.60);
 }
 
 .metric .value{
@@ -130,23 +144,23 @@ h1, h2, h3 {
   font-weight: 900;
 }
 
-/* ===== Button ===== */
+/* button */
 .stButton>button{
   border-radius: 14px;
   padding: 10px 16px;
   font-weight: 800;
 }
 
-/* ===== Sidebar ===== */
+/* sidebar */
 section[data-testid="stSidebar"]{
   background: rgba(255,255,255,0.75);
   border-right: 1px solid rgba(0,0,0,0.06);
 }
 
-/* Footer */
+/* footer */
 .footer{
   text-align:center;
   color: rgba(17,24,39,0.55);
-  margin-top: 16px;
+  margin-top: 14px;
   font-size: 0.95rem;
 }
