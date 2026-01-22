@@ -61,6 +61,8 @@ def load_model():
 
 model = load_model()
 
+st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+
 # ==============================
 # HERO
 # ==============================
@@ -134,3 +136,4 @@ with col_right:
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div class='footer'>Model: CNN MobileNetV2 • Output: Top-3 Prediksi</div>", unsafe_allow_html=True)
+
