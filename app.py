@@ -35,8 +35,6 @@ def load_css(path: str):
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    else:
-        st.error(f"CSS tidak ditemukan: {path}")
 
 load_css(CSS_PATH)
 
@@ -54,8 +52,6 @@ if os.path.exists(BANNER_PATH):
         f"<style>:root{{--hero-bg:url('{hero_bg}');}}</style>",
         unsafe_allow_html=True
     )
-else:
-    st.warning("Banner tidak ditemukan: assets/banner.png (cek nama file/huruf besar-kecil)")
 
 # ==============================
 # LOAD MODEL
@@ -96,30 +92,22 @@ with col_left:
     )
 
     if uploaded is None:
-        st.info("Silakan upload gambar tokoh wayang.")
+        # clean: info kecil aja, gak rame
+        st.caption("Silakan upload gambar tokoh wayang.")
         st.markdown("</div>", unsafe_allow_html=True)
     else:
         img = Image.open(uploaded).convert("RGB")
         st.image(img, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------- RIGHT: RESULT / PLACEHOLDER ----------
+# ---------- RIGHT: RESULT ----------
 with col_right:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📌 Hasil Prediksi")
 
     if uploaded is None:
-        st.info("Upload gambar dulu yaa—nanti hasil prediksi muncul di sini 😊")
-        st.markdown("""
-        <div style="margin-top:10px; color: rgba(31,41,55,0.70); line-height:1.6;">
-          <b>Tips biar hasil akurat:</b>
-          <ul style="margin-top:6px;">
-            <li>Gambar jelas (tidak blur).</li>
-            <li>Objek wayang terlihat penuh.</li>
-            <li>Pencahayaan cukup (tidak terlalu gelap).</li>
-          </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        # clean: kosong rapi tanpa notif box
+        st.caption("Hasil akan tampil setelah kamu upload gambar.")
         st.markdown("</div>", unsafe_allow_html=True)
     else:
         # preprocess
@@ -157,7 +145,3 @@ with col_right:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-# ==============================
-# FOOTER
-# ==============================
-st.markdown("<div class='footer'>Model: CNN MobileNetV2 • Output: Top-3 Prediksi</div>", unsafe_allow_html=True)
