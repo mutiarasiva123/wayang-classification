@@ -1,115 +1,82 @@
 :root{
   --hero-bg: none;
-
-  /* Keraton palette */
-  --ink: #1f2937;
-  --muted: rgba(31,41,55,.65);
-
   --gold: #d4af37;
-  --gold2: #f2d27a;
-  --gold3: rgba(212,175,55,.25);
-
   --paper1: #fff6e8;
-  --paper2: #f4e7d4;
-
-  --card: rgba(255, 252, 246, 0.92);
+  --paper2: #f2e2c8;
+  --card: rgba(255, 255, 255, 0.92);
   --stroke: rgba(0,0,0,0.10);
   --shadow: 0 14px 40px rgba(0,0,0,0.10);
+  --ink: #1f2937;
 }
 
-/* ===== Background: parchment texture-ish (tanpa gambar) ===== */
+/* Background */
 .stApp{
   background:
-    radial-gradient(circle at 18% 12%, rgba(212,175,55,0.12) 0%, rgba(0,0,0,0) 55%),
-    radial-gradient(circle at 90% 20%, rgba(212,175,55,0.08) 0%, rgba(0,0,0,0) 45%),
-    radial-gradient(circle at 30% 90%, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0) 55%),
+    radial-gradient(circle at 18% 12%, rgba(212,175,55,0.10) 0%, rgba(0,0,0,0) 55%),
+    radial-gradient(circle at 90% 20%, rgba(212,175,55,0.07) 0%, rgba(0,0,0,0) 45%),
     linear-gradient(180deg, var(--paper1) 0%, var(--paper2) 100%);
 }
 
-/* ===== Remove top junk ===== */
+/* Remove Streamlit header + top paddings */
 div[data-testid="stHeader"],
 div[data-testid="stToolbar"],
-div[data-testid="stDecoration"]{
-  display:none !important;
-}
+div[data-testid="stDecoration"]{ display:none !important; }
 
-div[data-testid="stAppViewBlockContainer"]{
-  padding-top: 0 !important; /* kill gap */
-}
+div[data-testid="stAppViewBlockContainer"]{ padding-top: 0 !important; }
 
+/* Container width (biar gak kelebaran) */
 .block-container{
-  max-width: 1180px;         /* lebih “premium” (nggak kelebaran) */
+  max-width: 1100px;
   padding-top: 0.4rem !important;
-  padding-bottom: 2rem !important;
+  padding-bottom: 1.8rem !important;
 }
 
-/* rapihin jarak antar blok */
-div[data-testid="stVerticalBlock"] > div{
-  margin-bottom: 0.7rem !important;
-}
+/* kill “empty blocks” that look like white bars */
+div[data-testid="stVerticalBlock"] > div:empty{ display:none !important; }
+div[data-testid="stHorizontalBlock"] > div:empty{ display:none !important; }
 
-/* typography */
-h1,h2,h3{ letter-spacing:-0.02em; color: var(--ink); }
+/* Typography */
+h1,h2,h3{ color: var(--ink); letter-spacing: -0.02em; }
 
-/* ===== HERO ===== */
+/* HERO */
 .hero{
   position: relative;
-  width: 100%;
-  border-radius: 24px;
+  border-radius: 22px;
   overflow: hidden;
   background-image: var(--hero-bg);
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
   box-shadow: var(--shadow);
-  border: 1px solid rgba(212,175,55,0.20);
-  margin: 0 0 14px 0;
-  min-height: 210px;
+  border: 1px solid rgba(212,175,55,0.22);
+  min-height: 200px;
+  margin-bottom: 14px;
 }
-
-/* Overlay: warm (bukan abu) + vignette */
 .hero::before{
   content:"";
-  position:absolute;
-  inset:0;
+  position:absolute; inset:0;
   background:
-    radial-gradient(circle at 30% 30%, rgba(212,175,55,0.22) 0%, rgba(0,0,0,0) 55%),
-    linear-gradient(90deg, rgba(30,18,10,0.70) 0%, rgba(30,18,10,0.35) 55%, rgba(30,18,10,0.50) 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.55));
+    radial-gradient(circle at 30% 30%, rgba(212,175,55,0.18) 0%, rgba(0,0,0,0) 55%),
+    linear-gradient(90deg, rgba(18,10,6,0.70) 0%, rgba(18,10,6,0.35) 55%, rgba(18,10,6,0.55) 100%);
 }
-
-.heroInner{
-  position: relative;
-  z-index: 2;
-  padding: 34px 34px;
-}
-
-/* badge */
+.heroInner{ position:relative; z-index:2; padding: 30px 30px; }
 .badge{
-  display:inline-flex;
-  align-items:center;
-  gap: 8px;
+  display:inline-block;
   padding: 7px 12px;
   border-radius: 999px;
   background: rgba(212,175,55,0.18);
   border: 1px solid rgba(212,175,55,0.55);
-  color: rgba(255,255,255,0.96);
+  color: rgba(255,255,255,0.95);
   font-weight: 900;
   font-size: 0.85rem;
   backdrop-filter: blur(6px);
 }
-
-/* title */
 .heroTitle{
   margin-top: 10px;
-  font-size: 2.45rem;
+  font-size: 2.35rem;
   font-weight: 950;
-  letter-spacing: -0.03em;
   color: #fff;
   text-shadow: 0 2px 16px rgba(0,0,0,0.55);
 }
-
-/* subtitle */
 .subtitle{
   margin-top: 10px;
   font-size: 1.02rem;
@@ -117,70 +84,47 @@ h1,h2,h3{ letter-spacing:-0.02em; color: var(--ink); }
   text-shadow: 0 2px 14px rgba(0,0,0,0.45);
 }
 
-/* ===== Cards ===== */
-.card{
-  border: 1px solid rgba(212,175,55,0.18);
+/* Book Card (1 besar) */
+.book{
+  border: 1px solid rgba(212,175,55,0.22);
   border-radius: 18px;
-  padding: 20px;
   background: var(--card);
   box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  padding: 18px 18px;
+}
+.ornament{
+  height: 1px;
+  width: 100%;
+  margin: 6px 0 14px 0;
+  background: linear-gradient(90deg, rgba(212,175,55,0.0), rgba(212,175,55,0.55), rgba(212,175,55,0.0));
+}
+
+/* Inner section titles */
+.sectionTitle{
+  font-weight: 900;
+  font-size: 1.25rem;
+  margin: 0 0 8px 0;
 }
 
 /* Upload area */
 [data-testid="stFileUploader"] > div{
-  border-radius: 16px;
+  border-radius: 14px;
   border: 1px dashed rgba(212,175,55,0.55);
-  background: rgba(255,252,246,0.75);
+  background: rgba(255,255,255,0.70);
   padding: 10px;
 }
 
 /* Metrics */
-.metricRow{
-  display:flex;
-  gap: 14px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-
+.metricRow{ display:flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 8px 0; }
 .metric{
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(212,175,55,0.25);
-  background: rgba(255,252,246,0.95);
-  min-width: 220px;
+  background: rgba(255,255,255,0.88);
+  min-width: 210px;
 }
+.metric .label{ font-size: .9rem; color: rgba(31,41,55,0.60); }
+.metric .value{ font-size: 1.15rem; font-weight: 950; color: rgba(31,41,55,0.95); }
 
-.metric .label{
-  font-size: 0.9rem;
-  color: rgba(31,41,55,0.60);
-}
-
-.metric .value{
-  font-size: 1.2rem;
-  font-weight: 950;
-  color: rgba(31,41,55,0.95);
-}
-
-/* Buttons: gold premium */
-.stButton>button{
-  border-radius: 14px;
-  padding: 10px 16px;
-  font-weight: 900;
-  border: 1px solid rgba(212,175,55,0.55) !important;
-  background: linear-gradient(180deg, rgba(242,210,122,0.98), rgba(212,175,55,0.95)) !important;
-  color: rgba(31,41,55,0.95) !important;
-  box-shadow: 0 10px 22px rgba(212,175,55,0.18);
-}
-
-/* Progress bar -> gold */
-div[role="progressbar"] > div{
-  background-color: var(--gold) !important;
-}
-
-/* Footer */
-.footer{
-  text-align:center;
-  color: rgba(31,41,55,0.62);
-  margin-top: 12px;
-  font-size: 0.95rem;
-}
+/* Progress bar color */
+div[role="progressbar"] > div{ background-color: var(--gold) !important; }
