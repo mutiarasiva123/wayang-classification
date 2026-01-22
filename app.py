@@ -15,13 +15,18 @@ st.set_page_config(
     layout="wide"
 )
 
+# ==============================
+# CONSTANTS
+# ==============================
 CLASS_NAMES = [
     "arjuna", "bagong", "bathara surya", "bathara wisnu", "gareng",
     "nakula", "petruk", "sadewa", "semar", "werkudara", "yudistira"
 ]
-
 MODEL_PATH = "cnn_mobilenetv2_wayang_final.h5"
 IMG_SIZE = (224, 224)
+
+CSS_PATH = "assets/style.css"
+BANNER_PATH = "assets/banner.png"
 
 # ==============================
 # LOAD CSS
@@ -33,18 +38,18 @@ def load_css(path: str):
     else:
         st.error(f"CSS tidak ditemukan: {path}")
 
-load_css("assets/style.css")
+load_css(CSS_PATH)
 
 # ==============================
-# INJECT HERO BANNER AS CSS VARIABLE (base64)
+# INJECT BANNER AS CSS VARIABLE (BASE64)
 # ==============================
-def to_data_uri(png_path: str) -> str:
-    with open(png_path, "rb") as f:
+def png_to_data_uri(path: str) -> str:
+    with open(path, "rb") as f:
         b64 = base64.b64encode(f.read()).decode("utf-8")
     return f"data:image/png;base64,{b64}"
 
-if os.path.exists("assets/banner.png"):
-    hero_bg = to_data_uri("assets/banner.png")
+if os.path.exists(BANNER_PATH):
+    hero_bg = png_to_data_uri(BANNER_PATH)
     st.markdown(
         f"<style>:root{{--hero-bg:url('{hero_bg}');}}</style>",
         unsafe_allow_html=True
@@ -60,8 +65,6 @@ def load_model():
     return tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 model = load_model()
-
-st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
 
 # ==============================
 # HERO
@@ -79,8 +82,9 @@ st.markdown("""
 # ==============================
 # MAIN LAYOUT
 # ==============================
-col_left, col_right = st.columns([1.4, 1], gap="large")
+col_left, col_right = st.columns([1.25, 1], gap="large")
 
+# ---------- LEFT: UPLOAD ----------
 with col_left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📤 Upload Gambar")
@@ -94,46 +98,66 @@ with col_left:
     if uploaded is None:
         st.info("Silakan upload gambar tokoh wayang.")
         st.markdown("</div>", unsafe_allow_html=True)
-        st.stop()
+    else:
+        img = Image.open(uploaded).convert("RGB")
+        st.image(img, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    img = Image.open(uploaded).convert("RGB")
-    st.image(img, use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
+# ---------- RIGHT: RESULT / PLACEHOLDER ----------
 with col_right:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("📌 Hasil Prediksi")
 
-    img_resized = img.resize(IMG_SIZE)
-    x = np.array(img_resized, dtype=np.float32)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-
-    probs = model.predict(x, verbose=0)[0]
-    pred_idx = int(np.argmax(probs))
-    pred_label = CLASS_NAMES[pred_idx]
-    pred_conf = float(probs[pred_idx])
-
-    st.markdown(f"""
-    <div class="metricRow">
-        <div class="metric">
-            <div class="label">Prediksi</div>
-            <div class="value">{pred_label}</div>
+    if uploaded is None:
+        st.info("Upload gambar dulu yaa—nanti hasil prediksi muncul di sini 😊")
+        st.markdown("""
+        <div style="margin-top:10px; color: rgba(31,41,55,0.70); line-height:1.6;">
+          <b>Tips biar hasil akurat:</b>
+          <ul style="margin-top:6px;">
+            <li>Gambar jelas (tidak blur).</li>
+            <li>Objek wayang terlihat penuh.</li>
+            <li>Pencahayaan cukup (tidak terlalu gelap).</li>
+          </ul>
         </div>
-        <div class="metric">
-            <div class="label">Confidence</div>
-            <div class="value">{pred_conf:.4f}</div>
+        """, unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        # preprocess
+        img_resized = img.resize(IMG_SIZE)
+        x = np.array(img_resized, dtype=np.float32)
+        x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
+
+        # predict
+        probs = model.predict(x, verbose=0)[0]
+        pred_idx = int(np.argmax(probs))
+        pred_label = CLASS_NAMES[pred_idx]
+        pred_conf = float(probs[pred_idx])
+
+        # main prediction
+        st.markdown(f"""
+        <div class="metricRow">
+            <div class="metric">
+                <div class="label">Prediksi</div>
+                <div class="value">{pred_label}</div>
+            </div>
+            <div class="metric">
+                <div class="label">Confidence</div>
+                <div class="value">{pred_conf:.4f}</div>
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    st.markdown("**Top-3 Prediksi:**")
-    top3 = np.argsort(probs)[::-1][:3]
-    for i, idx in enumerate(top3, start=1):
-        st.progress(float(probs[idx]))
-        st.write(f"**{i}. {CLASS_NAMES[idx]}** — {probs[idx]:.4f}")
+        # top-3
+        st.markdown("**Top-3 Prediksi:**")
+        top3 = np.argsort(probs)[::-1][:3]
+        for i, idx in enumerate(top3, start=1):
+            st.progress(float(probs[idx]))
+            st.write(f"**{i}. {CLASS_NAMES[idx]}** — {probs[idx]:.4f}")
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
+# ==============================
+# FOOTER
+# ==============================
 st.markdown("<div class='footer'>Model: CNN MobileNetV2 • Output: Top-3 Prediksi</div>", unsafe_allow_html=True)
-
