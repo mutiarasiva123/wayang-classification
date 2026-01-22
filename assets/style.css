@@ -3,12 +3,10 @@
   background: radial-gradient(circle at top left, #fff7ed 0%, #f5f3ff 40%, #ecfeff 100%);
 }
 
-/* Layout container */
+/* Layout container (jangan ekstrem, spacing utama diatur app.py) */
 .block-container{
   max-width: 1300px;
-  padding-top: 0rem !important;     /* FIX: biar gak terlalu turun */
   padding-bottom: 2rem;
-  margin-top: -28px !important;     /* FIX: tarik konten ke atas */
 }
 
 /* Hide Streamlit top decorations */
@@ -23,66 +21,11 @@ h1, h2, h3 {
   letter-spacing: -0.02em;
 }
 
-/* Subtitle default (dipakai di hero juga) */
-.subtitle{
-  color: rgba(255,255,255,0.92); /* default untuk hero */
-  margin-top: 8px;
-  margin-bottom: 0px;
-  font-size: 1.05rem;
-}
-
-/* ===== HERO BANNER (pakai assets/banner.png) ===== */
-.hero{
-  position: relative;
-  border-radius: 0 0 28px 28px;          /* keren: cuma bawah rounded */
-  padding: 52px 36px;
-  margin: 0 0 26px 0;
-  background-image: url("assets/banner.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
-  overflow: hidden;
-}
-
-/* overlay gelap biar teks kebaca */
-.hero::before{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    rgba(0,0,0,0.42),
-    rgba(0,0,0,0.58)
-  );
-}
-
-/* supaya isi hero tampil di atas overlay */
-.hero > *{
-  position: relative;
-  z-index: 2;
-}
-
-/* Title */
-.heroTitle{
-  font-size: 2.65rem;
-  font-weight: 900;
-  margin: 10px 0 0 0;
-  color: #fff;
-  letter-spacing: -0.03em;
-}
-
-/* Badge */
-.badge{
-  display: inline-block;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.38);
-  color: #fff;
-  font-weight: 800;
-  font-size: 0.85rem;
-  backdrop-filter: blur(6px);
-}
+/* NOTE:
+   .hero, .heroTitle, .badge, .subtitle, dan spacing top
+   sudah di-handle dari app.py (base64 banner).
+   Jadi di sini tidak usah di-set lagi biar tidak konflik.
+*/
 
 /* ===== Cards ===== */
 .card{
